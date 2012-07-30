@@ -2,6 +2,20 @@
 <?php
     $colNames = $this->columnNames;
     $colExamples = $this->columnExamples;
+    $headers = array();
+    switch ($this->recordTypeId) {
+        case 2:
+            $headers = array('Tags?', 'File?');
+            break;
+
+        case 3:
+            $headers = array('Filename?');
+            break;
+
+        default:
+            $headers = array('Tags?', 'File?');
+            break;
+    }
 ?>
     <table id="column-mappings" class="simple" cellspacing="0" cellpadding="0">
     <thead>
@@ -10,8 +24,9 @@
         <th>Example from CSV File</th>
         <th>Map To Element</th>
         <th>Use HTML?</th>
-        <th>Tags?</th>
-        <th>File?</th>
+        <?php foreach($headers as $header){ ?>
+        <th><?php echo $header; ?></th>
+        <?php } ?>
     </tr>
     </thead>
     <tbody>

@@ -70,6 +70,7 @@ class CsvImport_IndexController extends Omeka_Controller_Action
         $this->session->columnDelimiter = $delimiter;
         
         $this->session->itemTypeId = $form->getValue('item_type_id');
+        $this->session->recordTypeId = $form->getValue('record_type_id');
         $this->session->itemsArePublic = $form->getValue('items_are_public');
         $this->session->itemsAreFeatured = $form->getValue('items_are_featured');
         $this->session->collectionId = $form->getValue('collection_id');
@@ -97,6 +98,7 @@ class CsvImport_IndexController extends Omeka_Controller_Action
             'itemTypeId' => $this->session->itemTypeId,
             'columnNames' => $this->session->columnNames,
             'columnExamples' => $this->session->columnExamples,
+            'recordTypeId' => $this->session->recordTypeId
         ));
         $this->view->form = $form;
                 
@@ -304,7 +306,7 @@ class CsvImport_IndexController extends Omeka_Controller_Action
     private function _sessionIsValid()
     {
         $requiredKeys = array('itemsArePublic', 'itemsAreFeatured',
-            'collectionId', 'itemTypeId', 'ownerId');
+            'collectionId', 'itemTypeId', 'ownerId', 'recordTypeId');
 
         foreach ($requiredKeys as $key) {
             if (!isset($this->session->$key)) {

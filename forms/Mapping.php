@@ -18,6 +18,7 @@ class CsvImport_Form_Mapping extends Omeka_Form
     private $_itemTypeId;
     private $_columnNames = array();
     private $_columnExamples = array();
+    private $_recordTypeId;
 
     public function init()
     {
@@ -41,9 +42,17 @@ class CsvImport_Form_Mapping extends Omeka_Form
             );
             $selectElement->setIsArray(true);
             $rowSubForm->addElement($selectElement);
-            $rowSubForm->addElement('checkbox', 'html');
-            $rowSubForm->addElement('checkbox', 'tags');
-            $rowSubForm->addElement('checkbox', 'file');
+
+            // if record type is file, add checkbox for filename
+            if ($this->_recordTypeId == 3) {
+                $rowSubForm->addElement('checkbox', 'html');
+                $rowSubForm->addElement('checkbox', 'filename');
+            }
+            else {
+                $rowSubForm->addElement('checkbox', 'html');
+                $rowSubForm->addElement('checkbox', 'tags');
+                $rowSubForm->addElement('checkbox', 'file');
+            }
             $this->_setSubFormDecorators($rowSubForm);
             $this->addSubForm($rowSubForm, "row$index");
         }
@@ -62,6 +71,7 @@ class CsvImport_Form_Mapping extends Omeka_Form
                 'form' => $this,
                 'columnExamples' => $this->_columnExamples,
                 'columnNames' => $this->_columnNames,
+                'recordTypeId' => $this->_recordTypeId,
             )),
         ));
     }
@@ -79,6 +89,11 @@ class CsvImport_Form_Mapping extends Omeka_Form
     public function setItemTypeId($itemTypeId)
     {
         $this->_itemTypeId = $itemTypeId;
+    }
+    // sets record type id
+    public function setRecordTypeId($recordTypeId)
+    {
+        $this->_recordTypeId = $recordTypeId;
     }
 
     public function getMappings()
@@ -98,12 +113,23 @@ class CsvImport_Form_Mapping extends Omeka_Form
 
     private function isTagMapped($index)
     {
-        return $this->getSubForm("row$index")->tags->isChecked();
+        if ($this->getSubForm("row$index")->tags) {
+            return $this->getSubForm("row$index")->tags->isChecked();
+        }
     }
 
     private function isFileMapped($index)
     {
-        return $this->getSubForm("row$index")->file->isChecked();
+        if ($this->getSubForm("row$index")->file) {
+            return $this->getSubForm("row$index")->file->isChecked();
+        }
+    }
+    // return true if filename box is checked
+    private function isFilenameMapped($index)
+    {
+        if ($this->getSubForm("row$index")->filename) {
+            return $this->getSubForm("row$index")->filename->isChecked();
+        }
     }
 
     private function getMappedElementId($index)
@@ -152,6 +178,10 @@ class CsvImport_Form_Mapping extends Omeka_Form
 
         if ($this->isFileMapped($index)) {
             $columnMap[] = new CsvImport_ColumnMap_File($columnName);
+        }
+        // add filename to columnMap
+        if ($this->isFilenameMapped($index)) {
+            $columnMap = new CsvImport_ColumnMap_Filename($columnName);
         }
 
         $elementIds = $this->getMappedElementId($index);

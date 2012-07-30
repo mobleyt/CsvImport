@@ -8,6 +8,7 @@
  * @copyright Center for History and New Media, 2008-2011
  * @license http://www.gnu.org/licenses/gpl-3.0.txt
  **/
+
 class CsvImport_Import extends Omeka_Record
 {
 
@@ -29,6 +30,7 @@ class CsvImport_Import extends Omeka_Record
     public $collection_id;
     public $owner_id;
     public $added;
+    public $record_type_id;
 
     public $delimiter;
     public $is_public;
@@ -90,6 +92,11 @@ class CsvImport_Import extends Omeka_Record
     public function setItemTypeId($id)
     {
         $this->item_type_id = (int)$id;
+    }
+    // sets record type id
+    public function setRecordTypeId($id)
+    {
+        $this->record_type_id = (int)$id;
     }
 
     public function setStatus($status)
@@ -257,11 +264,20 @@ class CsvImport_Import extends Omeka_Record
                 $row = $rows->current();
                 $index = $rows->key();
                 $this->skipped_row_count += $rows->getSkippedCount();
-
-                if ($item = $this->_addItemFromRow($row, $itemMetadata, $maps)) {
-                    release_object($item);
+                // process as item by default (i.e. if record type id is not set to file) 
+                // otherwise process as file element text metadata
+                if ($this->record_type_id != 3) {
+                    if ($item = $this->_addItemFromRow($row, $itemMetadata, $maps)) {
+                        release_object($item);
+                    } else {
+                        $this->skipped_item_count++;
+                    }
                 } else {
-                    $this->skipped_item_count++;
+                    if ($file = $this->_addFileElementTextFromRow($row, $itemMetadata, $maps)) {
+                        release_object($file);
+                    } else {
+                        $this->skipped_item_count++;
+                    }
                 }
                 $this->file_position = $this->getIterator()->tell();
                 if ($this->_batchSize && ($index % $this->_batchSize == 0)) {
@@ -381,6 +397,36 @@ class CsvImport_Import extends Omeka_Record
         // Makes it easy to unimport the item later.
         $this->recordImportedItemId($item->id);
         return $item;
+    }
+
+    // adds element text records for file based on the row data
+    private function _addFileElementTextFromRow($row, $itemMetadata, $maps)
+    {
+        $result = $maps->map($row);        
+        $filename = $result[CsvImport_ColumnMap::TARGET_TYPE_FILENAME];
+        $elementTexts = $result[CsvImport_ColumnMap::TARGET_TYPE_ELEMENT];
+        $file = $this->_getFileByOriginalFilename($filename);
+        if (!$file) {
+            throw new Omeka_Record_Exception(__('No items associated with filename "%s" were found. Add items first before importing file metadata',
+             $filename));
+        }
+        // overwrite existing element text values
+        foreach ($elementTexts as $key => $info) {
+            if ($info['element_id']) {
+                $file->deleteElementTextsbyElementId((array)$info['element_id']);
+            }
+        }
+        $file->addElementTextsByArray($elementTexts);
+        $file->save();
+        return $file;
+    }
+
+    // fetches File object from Files table by original_filename
+    private function _getFileByOriginalFilename($filename)
+    {
+        $select = $this->_db->getTable('File')->getSelect();
+        $select->where($this->_db->getTable('File')->getTableAlias().'.original_filename = ?', $filename);
+        return $this->_db->getTable('File')->fetchObject($select);
     }
 
     private function recordImportedItemId($itemId)

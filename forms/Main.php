@@ -28,6 +28,9 @@ class CsvImport_Form_Main extends Omeka_Form
         $this->_addFileElement();
         $values = get_db()->getTable('ItemType')->findPairsForSelectForm();
         $values = array('' => 'Select Item Type') + $values;
+
+        // radio button for selecting record type
+        $this->addElement('radio', 'record_type_id', array('label' => 'Record type', 'multiOptions' => array(2 => 'Item', 3 => 'File')));
         
         $this->addElement('checkbox', 'omeka_csv_export', array(
             'label' => 'Use an export from Omeka CSV Report', 'description'=> 'Selecting this will override the options below.'
