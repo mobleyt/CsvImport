@@ -12,15 +12,16 @@
     <?php
     echo $this->form;
     ?>
-    
+
 </div>
 <script type="text/javascript">
 //<![CDATA[
 jQuery(document).ready(function () {
     Omeka.CsvImport.enableElementMapping();
+    Omeka.CsvImport.assistWithMapping();
 });
 //]]>
 </script>
-<?php 
-    foot(); 
+<?php
+    foot();
 ?>
