@@ -181,7 +181,7 @@ class CsvImport_Form_Mapping extends Omeka_Form
         }
         // add filename to columnMap
         if ($this->isFilenameMapped($index)) {
-            $columnMap = new CsvImport_ColumnMap_Filename($columnName);
+            $columnMap[] = new CsvImport_ColumnMap_Filename($columnName);
         }
 
         $elementIds = $this->getMappedElementId($index);
