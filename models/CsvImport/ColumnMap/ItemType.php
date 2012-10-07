@@ -1,6 +1,6 @@
 <?php
 class CsvImport_ColumnMap_ItemType extends CsvImport_ColumnMap {
-    
+
     public function __construct($columnName)
     {
         parent::__construct($columnName);

@@ -6,11 +6,11 @@
  * @package CsvImport
  */
 
-define('CSVIMPORT_BASE', realpath(dirname(__FILE__) . '/../')); 
+define('CSVIMPORT_BASE', realpath(dirname(__FILE__) . '/../'));
 set_include_path(get_include_path() . PATH_SEPARATOR . CSVIMPORT_BASE);
 
 /**
- * 
+ *
  *
  * @package CsvImport
  * @copyright Center for History and New Media, 2011

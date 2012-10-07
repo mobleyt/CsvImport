@@ -3,7 +3,7 @@
 class CsvImport_ColumnMap_Set
 {
     private $_maps = array();
-    
+
     public function __construct(array $maps)
     {
         $this->_maps = $maps;
@@ -24,7 +24,7 @@ class CsvImport_ColumnMap_Set
             CsvImport_ColumnMap::METADATA_FEATURED => null,
             CsvImport_ColumnMap::METADATA_ITEM_TYPE => null,
             CsvImport_ColumnMap::METADATA_PUBLIC => null
-            
+
         );
         foreach ($this->_maps as $map) {
             $subset = $allResults[$map->getType()];

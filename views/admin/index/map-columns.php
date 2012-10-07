@@ -1,5 +1,5 @@
-<?php 
-    head(array('title' => 'CSV Import', 'bodyclass' => 'primary', 
+<?php
+    head(array('title' => 'CSV Import', 'bodyclass' => 'primary',
         'content_class' => 'horizontal-nav'));
 ?>
 <h1>CSV Import</h1>

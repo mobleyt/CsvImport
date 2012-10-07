@@ -9,7 +9,7 @@
 
 /**
  * CsvImport_File - represents a csv file
- * 
+ *
  * @package CsvImport
  * @author CHNM
  **/
@@ -27,7 +27,7 @@ class CsvImport_File implements IteratorAggregate
      * @param string $filePath Absolute path to the file.
      * @param string|null $delimiter Optional Column delimiter for the CSV file.
      */
-    public function __construct($filePath, $delimiter = null) 
+    public function __construct($filePath, $delimiter = null)
     {
         $this->_filePath = $filePath;
         if ($delimiter) {
@@ -37,45 +37,45 @@ class CsvImport_File implements IteratorAggregate
 
     /**
      * Absolute path to the file.
-     * 
+     *
      * @return string
      */
-    public function getFilePath() 
+    public function getFilePath()
     {
         return $this->_filePath;
     }
 
     /**
      * Get an array of headers for the column names
-     * 
+     *
      * @return array
      */
-    public function getColumnNames() 
+    public function getColumnNames()
     {
         if (!$this->_columnNames) {
             throw new LogicException("CSV file must be validated before "
                 . "retrieving the list of columns.");
         }
-        return $this->_columnNames;    
+        return $this->_columnNames;
     }
 
     /**
      * Get an array of example data for the columns.
-     * 
+     *
      * @return array Examples have the same order as the column names.
      */
-    public function getColumnExamples() 
+    public function getColumnExamples()
     {
         if (!$this->_columnExamples) {
             throw new LogicException("CSV file must be validated before "
                 . "retrieving list of column examples.");
         }
-        return $this->_columnExamples;    
+        return $this->_columnExamples;
     }
 
     /**
      * Get iterator.
-     * 
+     *
      * @return CsvImport_RowIterator
      */
     public function getIterator()
@@ -88,7 +88,7 @@ class CsvImport_File implements IteratorAggregate
     }
 
     /**
-     * Parse metadata.  Currently retrieves the column names and an "example" 
+     * Parse metadata.  Currently retrieves the column names and an "example"
      * row, i.e. the first row after the header.
      */
     public function parse()
@@ -100,9 +100,9 @@ class CsvImport_File implements IteratorAggregate
         $rowIterator = $this->getIterator();
         try {
             $this->_columnNames = $rowIterator->getColumnNames();
-            $this->_columnExamples = $rowIterator->current(); 
+            $this->_columnExamples = $rowIterator->current();
         } catch (CsvImport_DuplicateColumnException $e) {
-            $this->_parseErrors[] = $e->getMessage() 
+            $this->_parseErrors[] = $e->getMessage()
                 . " Please ensure that all column names are unique.";
             //_log("[CsvImport] Error parsing CSV file '{$this->_filePath}': "
                 //. $e->getMessage(), Zend_Log::NOTICE);

@@ -24,11 +24,11 @@ class CsvImport_Form_Mapping extends Omeka_Form
     {
         parent::init();
         $this->setAttrib('id', 'csvimport-mapping');
-        $this->setMethod('post'); 
+        $this->setMethod('post');
 
-        $elementsByElementSetName = 
+        $elementsByElementSetName =
             csv_import_get_elements_by_element_set_name($this->_itemTypeId);
-        $elementsByElementSetName = array('' => 'Select Below') 
+        $elementsByElementSetName = array('' => 'Select Below')
                                   + $elementsByElementSetName;
         foreach ($this->_columnNames as $index => $colName) {
             $rowSubForm = new Zend_Form_SubForm();
@@ -186,12 +186,12 @@ class CsvImport_Form_Mapping extends Omeka_Form
 
         $elementIds = $this->getMappedElementId($index);
         $isHtml = $this->_getRowValue($index, 'html');
-        foreach($elementIds as $elementId) {
+        foreach ($elementIds as $elementId) {
             // Make sure to skip empty mappings
             if (!$elementId) {
                 continue;
             }
-            
+
             $elementMap = new CsvImport_ColumnMap_Element($columnName);
             $elementMap->setOptions(array('elementId' => $elementId,
                                          'isHtml' => $isHtml));

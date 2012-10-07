@@ -1,5 +1,5 @@
-<?php 
-    head(array('title' => 'CSV Import', 'bodyclass' => 'primary', 
+<?php
+    head(array('title' => 'CSV Import', 'bodyclass' => 'primary',
         'content_class' => 'horizontal-nav'));
 ?>
 <h1>CSV Import</h1>
@@ -20,27 +20,31 @@
             </tr>
         </thead>
         <tbody>
-            <?php foreach($csvimport_imports as $csvImport): ?>
+            <?php foreach ($csvimport_imports as $csvImport): ?>
             <tr>
                 <td><?php echo html_escape($csvImport->added); ?></td>
                 <td><?php echo html_escape($csvImport->original_filename); ?></td>
                 <td><?php echo $csvImport->getProgress(); ?></td>
                 <td><?php echo html_escape(Inflector::humanize($csvImport->status)); ?></td>
                 <?php
-                    if ($csvImport->isFinished() 
+                    if ($csvImport->isFinished()
                         || $csvImport->isStopped()
                         || $csvImport->isError()): ?>
                     <td><?php echo delete_button($this->url(
-                        array('action' => 'undo-import',
-                              'id' => $csvImport->id),
+                        array(
+                            'action' => 'undo-import',
+                            'id' => $csvImport->id,
+                        ),
                         'default'),
                         'undo_import',
                         'Undo Import',
                         array('class' => 'csv-undo-import delete-button')); ?>
                 <?php elseif ($csvImport->isUndone()): ?>
                     <td><?php echo delete_button($this->url(
-                        array('action' => 'clear-history',
-                              'id' => $csvImport->id),
+                        array(
+                            'action' => 'clear-history',
+                            'id' => $csvImport->id,
+                        ),
                         'default'),
                         'clear_history',
                         'Clear History',
@@ -61,6 +65,6 @@ jQuery(document).ready(function () {
 });
 //]]>
 </script>
-<?php 
-    foot(); 
+<?php
+    foot();
 ?>

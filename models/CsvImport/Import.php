@@ -83,7 +83,7 @@ class CsvImport_Import extends Omeka_Record
     {
         $this->file_path = $path;
     }
-    
+
     public function setOriginalFilename($filename)
     {
         $this->original_filename = $filename;
@@ -206,7 +206,7 @@ class CsvImport_Import extends Omeka_Record
         $this->_log("Started import at: %time%");
         $this->status = self::IN_PROGRESS;
         $this->forceSave();
-        
+
         $this->_importLoop($this->file_position);
         return !$this->isError();
     }
@@ -264,7 +264,7 @@ class CsvImport_Import extends Omeka_Record
                 $row = $rows->current();
                 $index = $rows->key();
                 $this->skipped_row_count += $rows->getSkippedCount();
-                // process as item by default (i.e. if record type id is not set to file) 
+                // process as item by default (i.e. if record type id is not set to file)
                 // otherwise process as file element text metadata
                 if ($this->record_type_id != 3) {
                     if ($item = $this->_addItemFromRow($row, $itemMetadata, $maps)) {
@@ -347,21 +347,21 @@ class CsvImport_Import extends Omeka_Record
 
         //If this is coming from CSV Report, bring in the itemmetadata coming from the report
 
-        if(!is_null($result[CsvImport_ColumnMap::METADATA_COLLECTION])) {
+        if (!is_null($result[CsvImport_ColumnMap::METADATA_COLLECTION])) {
             $itemMetadata['collection_id'] = $result[CsvImport_ColumnMap::METADATA_COLLECTION];
         }
-        if(!is_null($result[CsvImport_ColumnMap::METADATA_PUBLIC])) {
+        if (!is_null($result[CsvImport_ColumnMap::METADATA_PUBLIC])) {
             $itemMetadata['public'] = $result[CsvImport_ColumnMap::METADATA_PUBLIC];
         }
-        if(!is_null($result[CsvImport_ColumnMap::METADATA_FEATURED])) {
+        if (!is_null($result[CsvImport_ColumnMap::METADATA_FEATURED])) {
             $itemMetadata['featured'] = $result[CsvImport_ColumnMap::METADATA_FEATURED];
         }
-        
-        if(!empty($result[CsvImport_ColumnMap::METADATA_ITEM_TYPE])) {
+
+        if (!empty($result[CsvImport_ColumnMap::METADATA_ITEM_TYPE])) {
             $itemMetadata['item_type_name'] = $result[CsvImport_ColumnMap::METADATA_ITEM_TYPE];
         }
 
-        
+
         try {
             $item = insert_item(array_merge(array('tags' => $tags),
                 $itemMetadata), $elementTexts);
@@ -370,29 +370,28 @@ class CsvImport_Import extends Omeka_Record
             return false;
         }
 
-        if(!empty($fileUrls)) {
-                foreach($fileUrls[0] as $url) {
+        if (!empty($fileUrls)) {
+            foreach ($fileUrls[0] as $url) {
 
-                    try {
-                        $file = insert_files_for_item($item,
-                            'Url', $url,
-                            array(
-                                'ignore_invalid_files' => false,
-                            )
-                        );
+                try {
+                    $file = insert_files_for_item($item,
+                        'Url', $url,
+                        array(
+                            'ignore_invalid_files' => false,
+                        )
+                    );
 
-                    } catch (Omeka_File_Ingest_InvalidException $e) {
-                        $msg = "Error occurred when attempting to ingest the "
-                             . "following URL as a file: '$url': "
-                             . $e->getMessage();
-                        $this->_log($msg, Zend_Log::INFO);
-                        $item->delete();
-                        return false;
-                    }
-                    release_object($file);
+                } catch (Omeka_File_Ingest_InvalidException $e) {
+                    $msg = "Error occurred when attempting to ingest the "
+                            . "following URL as a file: '$url': "
+                            . $e->getMessage();
+                    $this->_log($msg, Zend_Log::INFO);
+                    $item->delete();
+                    return false;
                 }
+                release_object($file);
+            }
         }
-
 
         // Makes it easy to unimport the item later.
         $this->recordImportedItemId($item->id);
@@ -402,12 +401,12 @@ class CsvImport_Import extends Omeka_Record
     // adds element text records for file based on the row data
     private function _addFileElementTextFromRow($row, $itemMetadata, $maps)
     {
-        $result = $maps->map($row);        
+        $result = $maps->map($row);
         $filename = $result[CsvImport_ColumnMap::TARGET_TYPE_FILENAME];
         $elementTexts = $result[CsvImport_ColumnMap::TARGET_TYPE_ELEMENT];
         $file = $this->_getFileByOriginalFilename($filename);
         if (!$file) {
-            throw new Omeka_Record_Exception(__('No items associated with filename "%s" were found. Add items first before importing file metadata',
+            throw new Omeka_Record_Exception(__('File "%s" does not exist in the database. No item associated with it was found. Add items first before importing file metadata.',
              $filename));
         }
         // overwrite existing element text values
@@ -449,7 +448,7 @@ class CsvImport_Import extends Omeka_Record
 
     public function getColumnMaps()
     {
-        if($this->_columnMaps === null) {
+        if ($this->_columnMaps === null) {
             $columnMaps = unserialize($this->serialized_column_maps);
             if (!($columnMaps instanceof CsvImport_ColumnMap_Set)) {
                 throw new UnexpectedValueException("Column maps must be "

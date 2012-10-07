@@ -29,7 +29,7 @@ class CsvImport_ColumnMap_ExportedElement extends CsvImport_ColumnMap {
         //dig up the element_id
         $elementId = get_db()->getTable('Element')->findByElementSetNameAndElementName($data[0], $data[1])->id;
         $elementData = array($data[0] => array($data[1] => array() ) );
-        foreach($elementTextsData as $text) {
+        foreach ($elementTextsData as $text) {
             $result[] = array('element_id'=>$elementId, 'html' => 1, 'text'=>$text);
         }
         $result[] = $elementData;

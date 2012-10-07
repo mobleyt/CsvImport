@@ -1,9 +1,9 @@
 <?php
 /**
- * CsvImport_ImportedItem - represents an imported item for a specific csv 
+ * CsvImport_ImportedItem - represents an imported item for a specific csv
  * import event
- * 
- * @version $Id$ 
+ *
+ * @version $Id$
  * @package CsvImport
  * @author CHNM
  * @copyright Center for History and New Media, 2008-2011

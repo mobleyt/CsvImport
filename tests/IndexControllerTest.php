@@ -31,7 +31,7 @@ class CsvImport_IndexControllerTest extends Omeka_Test_AppTestCase
         //$opt['resources']['pluginbroker'] = $broker;
         //$bs->setOptions($opt);
     //}
-    
+
     public static function acl()
     {
         return array(
@@ -45,7 +45,7 @@ class CsvImport_IndexControllerTest extends Omeka_Test_AppTestCase
      */
     public function testAcl($isAllowed, $role, $resource, $privilege)
     {
-        $this->assertEquals($isAllowed, $this->acl->isAllowed($role, 
+        $this->assertEquals($isAllowed, $this->acl->isAllowed($role,
             $resource, $privilege));
     }
 }

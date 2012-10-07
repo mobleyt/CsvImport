@@ -63,6 +63,6 @@ Omeka.CsvImport = {};
      * Disable most options if Import from Csv Report is checked
      */
     Omeka.CsvImport.toggleImportOptions = function () {
-        $('div.field').has('#item_type_id, #collection_id, #items_are_public, #items_are_featured, #column_delimiter').slideToggle();
+        $('div.field').has(#item_type_id, #collection_id, #items_are_public, #items_are_featured, #column_delimiter').slideToggle();
     };
 })(jQuery);

@@ -23,14 +23,14 @@ class CsvImport_RowIterator implements SeekableIterator
     /**
      * @param string $filePath
      */
-    public function __construct($filePath, $delimiter = null) 
+    public function __construct($filePath, $delimiter = null)
     {
         $this->_filePath = $filePath;
         if ($delimiter) {
             $this->_delimiter = $delimiter;
         }
     }
-    
+
     /**
      * Rewind the Iterator to the first element.
      * Similar to the reset() function for arrays in PHP
@@ -121,7 +121,7 @@ class CsvImport_RowIterator implements SeekableIterator
         } else {
             $this->_currentRow = array();
         }
-        
+
         if (!$this->_currentRow) {
             fclose($this->_handle);
             $this->_valid = false;
@@ -150,11 +150,11 @@ class CsvImport_RowIterator implements SeekableIterator
     }
 
     /**
-     * Get the number of rows that were skipped since the last time 
+     * Get the number of rows that were skipped since the last time
      * the function was called.
      *
-     * Skipped count is reset to 0 after each call to getSkippedCount(). This 
-     * makes it easier to aggregate the number over multiple job runs. 
+     * Skipped count is reset to 0 after each call to getSkippedCount(). This
+     * makes it easier to aggregate the number over multiple job runs.
      */
     public function getSkippedCount()
     {
@@ -181,7 +181,7 @@ class CsvImport_RowIterator implements SeekableIterator
                 . "'$printable' does not have the required {$this->_colCount} "
                 . "rows.");
         }
-        for($i = 0; $i < $this->_colCount; $i++) 
+        for($i = 0; $i < $this->_colCount; $i++)
         {
             $formattedRow[$this->_colNames[$i]] = $row[$i];
         }

@@ -9,7 +9,7 @@
 require_once 'models/CsvImport/RowIterator.php';
 
 /**
- * 
+ *
  *
  * @package CsvImport
  * @copyright Center for History and New Media, 2011
@@ -25,10 +25,10 @@ class CsvImport_RowIteratorTest extends PHPUnit_Framework_TestCase
     );
 
     private $_validFirstRow = array(
-        'title' => "Robinson Crusoe", 
-        'creator' => "Daniel Defoe", 
-        'description' => "A man survives on an island.", 
-        'tags' => "book, classic, island", 
+        'title' => "Robinson Crusoe",
+        'creator' => "Daniel Defoe",
+        'description' => "A man survives on an island.",
+        'tags' => "book, classic, island",
         'file' => "",
     );
 
@@ -54,7 +54,7 @@ class CsvImport_RowIteratorTest extends PHPUnit_Framework_TestCase
     public function testGetColumnNames()
     {
         $iterator = new CsvImport_RowIterator($this->validFilePath);
-        $this->assertEquals(array_keys($this->_validHeader), 
+        $this->assertEquals(array_keys($this->_validHeader),
             $iterator->getColumnNames());
     }
 

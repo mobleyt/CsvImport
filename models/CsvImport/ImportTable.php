@@ -1,8 +1,8 @@
 <?php
 /**
  * Class for import table.
- * 
- * @version $Id$ 
+ *
+ * @version $Id$
  * @package CsvImport
  * @author CHNM
  * @copyright Center for History and New Media, 2008-2011

@@ -29,12 +29,17 @@ class CsvImport_Form_Main extends Omeka_Form
         $values = get_db()->getTable('ItemType')->findPairsForSelectForm();
         $values = array('' => 'Select Item Type') + $values;
 
-        // radio button for selecting record type
-        $this->addElement('radio', 'record_type_id', array('label' => 'Record type', 'multiOptions' => array(2 => 'Item', 3 => 'File')));
-        
         $this->addElement('checkbox', 'omeka_csv_export', array(
             'label' => 'Use an export from Omeka CSV Report', 'description'=> 'Selecting this will override the options below.'
         ));
+
+        // radio button for selecting record type
+        $this->addElement('radio', 'record_type_id', array(
+            'label' => 'Record type',
+            'multiOptions' => array(
+                2 => 'Item',
+                3 => 'File',
+        )));
 
         $this->addElement('select', 'item_type_id', array(
             'label' => 'Select Item Type',
@@ -204,7 +209,7 @@ class CsvImport_Form_Main extends Omeka_Form
         if (!preg_match('/(\d+)([KMG]?)/i', $size, $matches)) {
             return false;
         }
-        
+
         $sizeType = Zend_Measure_Binary::BYTE;
 
         $sizeTypes = array(
