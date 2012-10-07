@@ -13,8 +13,9 @@
         <thead>
             <tr>
                 <th>Import Date</th>
-                <th>CSV File</th>
-                <th>Item Count</th>
+                <th>CSV file</th>
+                <th>Record type</th>
+                <th>Item/file count</th>
                 <th>Status</th>
                 <th>Action</th>
             </tr>
@@ -24,6 +25,18 @@
             <tr>
                 <td><?php echo html_escape($csvImport->added); ?></td>
                 <td><?php echo html_escape($csvImport->original_filename); ?></td>
+                <td><?php
+                    switch ($csvImport->record_type_id) {
+                        case 1:
+                            echo __('All');
+                            break;
+                        case 2:
+                            echo __('Item');
+                            break;
+                        case 3:
+                            echo __('File');
+                            break;
+                    } ?></td>
                 <td><?php echo $csvImport->getProgress(); ?></td>
                 <td><?php echo html_escape(Inflector::humanize($csvImport->status)); ?></td>
                 <?php
