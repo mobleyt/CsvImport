@@ -39,7 +39,9 @@ class CsvImport_Form_Main extends Omeka_Form
             'multiOptions' => array(
                 2 => 'Item',
                 3 => 'File',
-        )));
+            ),
+            'required' => TRUE,
+        ));
 
         $this->addElement('select', 'item_type_id', array(
             'label' => 'Select Item Type',

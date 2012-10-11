@@ -26,7 +26,10 @@ class CsvImport_Form_Mapping extends Omeka_Form
         $this->setAttrib('id', 'csvimport-mapping');
         $this->setMethod('post');
 
-        $elementsByElementSetName =
+        // When importing metadata for files, display all elements sets (except
+        // if user chooses one) because files can belong to any type of item.
+        $elementsByElementSetName = ($this->_recordTypeId == 3) ?
+            csv_import_get_elements_by_element_set_name_file() :
             csv_import_get_elements_by_element_set_name($this->_itemTypeId);
         $elementsByElementSetName = array('' => 'Select Below')
                                   + $elementsByElementSetName;

@@ -118,7 +118,19 @@ function csv_import_admin_header($request)
  */
 function csv_import_get_elements_by_element_set_name($itemTypeId)
 {
-    $params = $itemTypeId ? array('item_type_id' => $itemTypeId)
-                          : array('exclude_item_type' => true);
+    $params = $itemTypeId ?
+        array('item_type_id' => $itemTypeId) :
+        array('exclude_item_type' => true);
+    return get_db()->getTable('Element')->findPairsForSelectForm($params);
+}
+
+/**
+ * @return array
+ */
+function csv_import_get_elements_by_element_set_name_file($recordTypeId = NULL)
+{
+    $params = $recordTypeId ?
+        array('record_types' => array($recordTypeId)) :
+        array('record_types' => array('All', 'File'));
     return get_db()->getTable('Element')->findPairsForSelectForm($params);
 }

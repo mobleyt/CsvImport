@@ -276,7 +276,7 @@ class CsvImport_IndexController extends Omeka_Controller_Action
     {
         return new Zend_Navigation(array(
             array(
-                'label' => 'Import items and files',
+                'label' => 'Import items and metadata',
                 'action' => 'index',
                 'module' => 'csv-import',
             ),
