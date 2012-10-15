@@ -76,6 +76,12 @@ class CsvImport_IndexController extends Omeka_Controller_Action
         $this->session->collectionId = $form->getValue('collection_id');
         $this->session->columnNames = $file->getColumnNames();
         $this->session->columnExamples = $file->getColumnExamples();
+        // A bug appears when examples contain UTF-8 characters like 'ГЧ„чŁ'.
+        // The bug is only here, not during import of characters into database.
+        foreach ($this->session->columnExamples as &$value) {
+            $value = iconv('ISO-8859-15', 'UTF-8', @iconv('UTF-8', 'ISO-8859-15' . '//IGNORE', $value));
+        }
+
         $this->session->ownerId = $this->getInvokeArg('bootstrap')->currentuser->id;
 
         if ($form->getValue('omeka_csv_export')) {
