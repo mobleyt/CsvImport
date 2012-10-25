@@ -13,6 +13,13 @@ class CsvImport_ColumnMap_File extends CsvImport_ColumnMap
         $urlString = trim($row[$this->_columnName]);
         if ($urlString) {
             $urls = explode(',', $urlString);
+            foreach ($urls as $key => $url) {
+                $urls[$key] = array(
+                    'source' => $url,
+                    'name' => $url,
+                    'order' => $key + 1,
+                );
+            }
             $result[] = $urls;
         }
         return $result;

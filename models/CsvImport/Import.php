@@ -361,7 +361,6 @@ class CsvImport_Import extends Omeka_Record
             $itemMetadata['item_type_name'] = $result[CsvImport_ColumnMap::METADATA_ITEM_TYPE];
         }
 
-
         try {
             $item = insert_item(array_merge(array('tags' => $tags),
                 $itemMetadata), $elementTexts);
@@ -371,8 +370,20 @@ class CsvImport_Import extends Omeka_Record
         }
 
         if (!empty($fileUrls)) {
-            foreach ($fileUrls[0] as $url) {
+            // As files are sometime imported in an incorrect order, user can
+            // set it with the value in the column "Omeka file order".
+            // During item import, we can't use a specific value, but the true
+            // order of files. The true value can be added during file import.
+            // This workaround is needed because order is not managed as other
+            // fields in Omeka.
+            $omekaFileOrder = (isset($row['Omeka file order'])
+                    && !empty($row['Omeka file order'])
+                    && !($row['Omeka file order'] == 'false')
+                ) ?
+                $row['Omeka file order'] :
+                null;
 
+            foreach ($fileUrls[0] as $url) {
                 try {
                     $file = insert_files_for_item($item,
                         'Url', $url,
@@ -381,6 +392,22 @@ class CsvImport_Import extends Omeka_Record
                         )
                     );
 
+                    // If there is no column "Omeka file order", default order
+                    // is not changed. It's sometime different than the natural
+                    // one.
+                    if (!is_null($omekaFileOrder)) {
+                        $file[0]->order = empty($omekaFileOrder) ?
+                            // If column "Omeka file order" is empty ('' or 0),
+                            // we force the order to null during item import.
+                            null :
+                            // Else we use the natural order during item import.
+                            $url['order'];
+
+                        // Not very clean but needed and efficient until Omeka 2.
+                        $data = array('order' => $file[0]->order);
+                        $where = array('id = ?' => $file[0]->id);
+                        $this->_db->update($this->_db->Files, $data, $where);
+                    }
                 } catch (Omeka_File_Ingest_InvalidException $e) {
                     $msg = "Error occurred when attempting to ingest the "
                             . "following URL as a file: '$url': "
@@ -416,6 +443,18 @@ class CsvImport_Import extends Omeka_Record
             }
         }
         $file->addElementTextsByArray($elementTexts);
+
+        // See note above, in _addItemFromRow().
+        // During import of files metadata, the true value of the field can be
+        // used.
+        if (isset($row['Omeka file order'])) {
+            $file->order = (empty($row['Omeka file order'])
+                    || $row['Omeka file order'] == 'false'
+                    || 0 == (integer) $row['Omeka file order']
+                ) ?
+                null :
+                (integer) $row['Omeka file order'];
+        }
         $file->save();
         return $file;
     }
