@@ -15,18 +15,23 @@
  * @author CHNM
  */
 
-// this fork includes new constants for record type (item or file) and file object filename
+// this fork includes new constants for record type (item or file), file object
+// filename and order.
 abstract class CsvImport_ColumnMap
 {
     const TARGET_TYPE_ELEMENT = 'Element';
     const TARGET_TYPE_TAG = 'Tag';
     const TARGET_TYPE_FILE = 'File';
     const TARGET_TYPE_FILENAME = 'Filename';
+
+    const METADATA_NONE = 'None';
     const METADATA_RECORD_TYPE = 'RecordType';
     const METADATA_COLLECTION = 'Collection';
     const METADATA_PUBLIC = 'Public';
     const METADATA_FEATURED = 'Featured';
     const METADATA_ITEM_TYPE = 'ItemType';
+    // Not managed as other data.
+    const METADATA_FILE_ORDER = 'FileOrder';
 
     protected $_columnName;
     protected $_targetType;

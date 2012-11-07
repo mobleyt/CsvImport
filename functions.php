@@ -41,7 +41,6 @@ function csv_import_install()
       KEY (`import_id`),
       UNIQUE (`item_id`)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;");
-
 }
 
 /**
@@ -54,6 +53,7 @@ function csv_import_uninstall()
     // delete the plugin options
     delete_option('csv_import_memory_limit');
     delete_option('csv_import_php_path');
+    delete_option('csv_import_html_elements');
 
     // drop the tables
     $db = get_db();
@@ -61,7 +61,6 @@ function csv_import_uninstall()
     $db->query($sql);
     $sql = "DROP TABLE IF EXISTS `{$db->prefix}csv_import_imported_items`";
     $db->query($sql);
-
 }
 
 /**
@@ -71,7 +70,6 @@ function csv_import_uninstall()
  */
 function csv_import_define_acl($acl)
 {
-
     if (version_compare(OMEKA_VERSION, '2.0-dev', '>=')) {
         $acl->addResource('CsvImport_Index');
     } else {

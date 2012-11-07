@@ -37,9 +37,11 @@ class CsvImport_Form_Main extends Omeka_Form
         $this->addElement('radio', 'record_type_id', array(
             'label' => 'Record type',
             'multiOptions' => array(
+                1 => 'All (via Omeka CSV Report)',
                 2 => 'Item',
                 3 => 'File',
             ),
+            'value' => 1,
             'required' => TRUE,
         ));
 
@@ -59,6 +61,10 @@ class CsvImport_Form_Main extends Omeka_Form
         ));
         $this->addElement('checkbox', 'items_are_featured', array(
             'label' => 'Feature All Items?',
+        ));
+        $this->addElement('checkbox', 'elements_are_html', array(
+            'label' => 'All imported elements are html?',
+            'description' => 'Used only with automatic import via Omeka CSV Report.',
         ));
 
         switch ($this->_columnDelimiter) {

@@ -69,11 +69,12 @@ class CsvImport_IndexController extends Omeka_Controller_Action
         $this->session->filePath = $filePath;
         $this->session->columnDelimiter = $delimiter;
 
-        $this->session->itemTypeId = $form->getValue('item_type_id');
         $this->session->recordTypeId = $form->getValue('record_type_id');
+        $this->session->collectionId = $form->getValue('collection_id');
+        $this->session->itemTypeId = $form->getValue('item_type_id');
         $this->session->itemsArePublic = $form->getValue('items_are_public');
         $this->session->itemsAreFeatured = $form->getValue('items_are_featured');
-        $this->session->collectionId = $form->getValue('collection_id');
+        $this->session->elementsAreHtml = $form->getValue('elements_are_html');
         $this->session->columnNames = $file->getColumnNames();
         $this->session->columnExamples = $file->getColumnExamples();
         // A bug appears when examples contain UTF-8 characters like 'ГЧ„чŁ'.
@@ -83,6 +84,8 @@ class CsvImport_IndexController extends Omeka_Controller_Action
         }
 
         $this->session->ownerId = $this->getInvokeArg('bootstrap')->currentuser->id;
+
+        set_option('csv_import_html_elements', $this->session->elementsAreHtml);
 
         if ($form->getValue('omeka_csv_export')) {
             $this->_helper->redirector->goto('check-omeka-csv');
@@ -152,13 +155,18 @@ class CsvImport_IndexController extends Omeka_Controller_Action
     }
 
     /**
-     * For import of Omeka.net CSV. Checks if the user didn't read the manual and so didn't make sure all needed Elements are present
+     * For import of Omeka.net CSV. Checks if the user didn't read the manual
+     * and so didn't make sure all needed Elements are present.
      */
-
     public function checkOmekaCsvAction()
     {
         $elementTable = get_db()->getTable('Element');
-        $skipColumns = array('itemType' , 'collection','tags','public','featured','file');
+        $skipColumns = array(
+            'importType', 'recordType',
+            'itemId',
+            'itemType', 'collection', 'public', 'featured', 'accessDate', 'tags', 'file',
+            'fileId', 'fileOrder', 'fileSource', 'fileAuthentication',
+        );
         $errors = array();
         foreach ($this->session->columnNames as $columnName) {
             if (!in_array($columnName, $skipColumns)) {
@@ -184,8 +192,20 @@ class CsvImport_IndexController extends Omeka_Controller_Action
         $headings = $this->session->columnNames;
         $columnMaps = array();
         foreach ($headings as $heading) {
-
             switch ($heading) {
+                case 'importType':
+                    // Currently not used.
+                    $columnMaps[] = new CsvImport_ColumnMap_None($heading);
+                    break;
+                case 'recordType':
+                    $columnMaps[] = new CsvImport_ColumnMap_RecordType($heading);
+                    break;
+
+                case 'sourceItemId':
+                    // Currently not used.
+                    $columnMaps[] = new CsvImport_ColumnMap_None($heading);
+                    break;
+
                 case 'collection':
                     $columnMaps[] = new CsvImport_ColumnMap_Collection($heading);
                     break;
@@ -204,18 +224,33 @@ class CsvImport_IndexController extends Omeka_Controller_Action
                 case 'featured':
                     $columnMaps[] = new CsvImport_ColumnMap_Featured($heading);
                     break;
+
+                case 'fileId':
+                    // Currently not used.
+                    $columnMaps[] = new CsvImport_ColumnMap_None($heading);
+                    break;
+                case 'fileSource':
+                    $columnMaps[] = new CsvImport_ColumnMap_Filename($heading);
+                    break;
+                case 'fileOrder':
+                    // TODO
+                    $columnMaps[] = new CsvImport_ColumnMap_FileOrder($heading);
+                    break;
+
                 default:
-                    //@TODO: make sure this doesn't break regular import
+                    // @TODO: make sure this doesn't break regular import.
                     $columnMaps[] = new CsvImport_ColumnMap_ExportedElement($heading);
                     break;
             }
         }
         $csvImport = new CsvImport_Import();
 
-        //this is the clever way that mapColumns action sets the values passed along from indexAction
-        //many will be irrelevant here, since CsvImport allows variable itemTypes and Collection
-
-        //@TODO: check if variable itemTypes and Collections breaks undo. It probably should, actually
+        // This is the clever way that mapColumns action sets the values passed
+        // along from indexAction. Many will be irrelevant here, since CsvImport
+        // allows variable itemTypes and Collection.
+        //
+        // @TODO: check if variable itemTypes and Collections breaks undo. It
+        // probably should, actually.
         foreach ($this->session->getIterator() as $key => $value) {
             $setMethod = 'set' . ucwords($key);
             if (method_exists($csvImport, $setMethod)) {
@@ -311,9 +346,15 @@ class CsvImport_IndexController extends Omeka_Controller_Action
 
     private function _sessionIsValid()
     {
-        $requiredKeys = array('itemsArePublic', 'itemsAreFeatured',
-            'collectionId', 'itemTypeId', 'ownerId', 'recordTypeId');
-
+        $requiredKeys = array(
+            'recordTypeId',
+            'collectionId',
+            'itemTypeId',
+            'itemsArePublic',
+            'itemsAreFeatured',
+            'elementsAreHtml',
+            'ownerId',
+        );
         foreach ($requiredKeys as $key) {
             if (!isset($this->session->$key)) {
                 return false;

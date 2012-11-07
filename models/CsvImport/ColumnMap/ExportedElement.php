@@ -12,6 +12,7 @@
 class CsvImport_ColumnMap_ExportedElement extends CsvImport_ColumnMap {
 
     private $_elementId;
+    private $_isHtml;
 
     public function __construct($columnName)
     {
@@ -28,9 +29,17 @@ class CsvImport_ColumnMap_ExportedElement extends CsvImport_ColumnMap {
         //$data is like array('Element Set Name', 'Element Name');
         //dig up the element_id
         $elementId = get_db()->getTable('Element')->findByElementSetNameAndElementName($data[0], $data[1])->id;
-        $elementData = array($data[0] => array($data[1] => array() ) );
+        $elementData = array(
+            $data[0] => array(
+                $data[1] => array(
+        )));
+        $this->_isHtml = (get_option('csv_import_html_elements') == 1) ? 1 : 0;
         foreach ($elementTextsData as $text) {
-            $result[] = array('element_id'=>$elementId, 'html' => 1, 'text'=>$text);
+            $result[] = array(
+                'element_id' => $elementId,
+                'html' => $this->_isHtml,
+                'text'=> $text,
+            );
         }
         $result[] = $elementData;
         return $result;
@@ -39,5 +48,6 @@ class CsvImport_ColumnMap_ExportedElement extends CsvImport_ColumnMap {
     public function setOptions($options)
     {
         $this->_elementId = $options['elementId'];
+        $this->_isHtml = (boolean)$options['isHtml'];
     }
 }
