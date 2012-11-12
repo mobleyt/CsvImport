@@ -36,6 +36,7 @@ function csv_import_install()
    $db->query("CREATE TABLE IF NOT EXISTS `{$db->prefix}csv_import_imported_items` (
       `id` int(10) unsigned NOT NULL auto_increment,
       `item_id` int(10) unsigned NOT NULL,
+      `source_item_id` varchar(255) collate utf8_unicode_ci,
       `import_id` int(10) unsigned NOT NULL,
       PRIMARY KEY  (`id`),
       KEY (`import_id`),
@@ -61,6 +62,35 @@ function csv_import_uninstall()
     $db->query($sql);
     $sql = "DROP TABLE IF EXISTS `{$db->prefix}csv_import_imported_items`";
     $db->query($sql);
+}
+
+function csv_import_upgrade($oldVersion, $newVersion)
+{
+    $db = get_db();
+    switch ($oldVersion) {
+        default:
+            $sql = "SHOW COLUMNS FROM `{$db->prefix}csv_import_imports` LIKE 'record_type_id'";
+            $result = $db->query($sql);
+            $result = $result->fetch();
+            if (empty($result)) {
+                $sql = "
+                    ALTER TABLE `{$db->prefix}csv_import_imports`
+                    ADD `record_type_id` int(10) unsigned NOT NULL AFTER `collection_id`
+                ";
+                $db->query($sql);
+            }
+
+            $sql = "SHOW COLUMNS FROM `{$db->prefix}csv_import_imported_items` LIKE 'source_item_id'";
+            $result = $db->query($sql);
+            $result = $result->fetch();
+            if (empty($result)) {
+                $sql = "
+                    ALTER TABLE `{$db->prefix}csv_import_imported_items`
+                    ADD `source_item_id` varchar(255) collate utf8_unicode_ci NOT NULL AFTER `item_id`
+                ";
+                $db->query($sql);
+            }
+    }
 }
 
 /**

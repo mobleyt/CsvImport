@@ -369,6 +369,10 @@ class CsvImport_Import extends Omeka_Record
             $itemMetadata['item_type_name'] = $result[CsvImport_ColumnMap::METADATA_ITEM_TYPE];
         }
 
+        $sourceItemId = isset($result[CsvImport_ColumnMap::SOURCE_ITEM_ID]) ?
+            $result[CsvImport_ColumnMap::SOURCE_ITEM_ID] :
+            0;
+
         try {
             $item = insert_item(array_merge(array('tags' => $tags), $itemMetadata), $elementTexts);
 
@@ -384,11 +388,11 @@ class CsvImport_Import extends Omeka_Record
             // order of files. The true value can be added during file import.
             // This workaround is needed because order is not managed as other
             // fields in Omeka.
-            $omekaFileOrder = (isset($row['fileOrder'])
-                    && !empty($row['fileOrder'])
-                    && !($row['fileOrder'] === 'false')
+            $fileOrder = (isset($result[CsvImport_ColumnMap::METADATA_FILE_ORDER])
+                    && !empty($result[CsvImport_ColumnMap::METADATA_FILE_ORDER])
+                    && !($result[CsvImport_ColumnMap::METADATA_FILE_ORDER] === 'false')
                 ) ?
-                $row['fileOrder'] :
+                $result[CsvImport_ColumnMap::METADATA_FILE_ORDER] :
                 null;
 
             foreach ($fileUrls[0] as $url) {
@@ -403,8 +407,8 @@ class CsvImport_Import extends Omeka_Record
                     // If there is no column "fileOrder", default order
                     // is not changed. It's sometime different than the natural
                     // one.
-                    if (!is_null($omekaFileOrder)) {
-                        $file[0]->order = empty($omekaFileOrder) ?
+                    if (!is_null($fileOrder)) {
+                        $file[0]->order = empty($fileOrder) ?
                             // If column "fileOrder" is empty ('' or 0),
                             // we force the order to null during item import.
                             null :
@@ -428,7 +432,7 @@ class CsvImport_Import extends Omeka_Record
             }
         }
         // Makes it easy to unimport the item later.
-        $this->recordImportedItemId($item->id);
+        $this->recordImportedItemId($item->id, $sourceItemId);
         return $item;
     }
 
@@ -437,13 +441,95 @@ class CsvImport_Import extends Omeka_Record
     {
         $result = $maps->map($row);
         $filename = $result[CsvImport_ColumnMap::TARGET_TYPE_FILENAME];
+
+        $sourceItemId = isset($result[CsvImport_ColumnMap::SOURCE_ITEM_ID]) ?
+            $result[CsvImport_ColumnMap::SOURCE_ITEM_ID] :
+            0;
+
+        // Check if there is a source item. If not, use original filename.
+        if (empty($sourceItemId)) {
+            return $this->_addMetadataToAttachedFile($result);
+        }
+
+        // Check if this source item has been imported.
+        $sql = "
+            SELECT item_id
+            FROM {$this->_db->csv_import_imported_items}
+            WHERE import_id = ?
+                AND source_item_id = ?
+        ";
+        $bind = array(
+            $this->id,
+            $sourceItemId,
+        );
+        $itemId = $this->_db->fetchOne($sql, $bind);
+        if (!$itemId) {
+            throw new Omeka_Record_Exception(__('File "%s" does not exist in the database. No item associated with it was found.',
+                $filename));
+        }
+
+        // get_item_by_id() is not available in model.
+        $item = $this->_db->getTable('Item')->find($itemId);
+        if (empty($item)) {
+            throw new Omeka_Record_Exception(__('File "%s" cannot be added to an item that has been removed.',
+                $filename));
+        }
+
+        // Set the file metadata.
+        $elementTexts = $result[CsvImport_ColumnMap::TARGET_TYPE_ELEMENT];
+        // Keep only non empty fields to avoid removing them (update).
+        $elementTexts = array_filter($elementTexts, 'self::_removeEmptyElement');
+
+        $url = array(
+            'source' => $filename,
+            'name' => $filename,
+            'metadata' => $elementTexts,
+        );
+
+        try {
+            $file = insert_files_for_item($item,
+                'Url', $url,
+                array(
+                    'ignore_invalid_files' => false,
+                )
+            );
+
+            // File order is not saved by default, so we add it now.
+            // See _addItemFromRow().
+            // If there is no column "fileOrder", default order is not changed.
+            if (isset($result[CsvImport_ColumnMap::METADATA_FILE_ORDER])
+                    && !empty($result[CsvImport_ColumnMap::METADATA_FILE_ORDER])
+                    && !($result[CsvImport_ColumnMap::METADATA_FILE_ORDER] === 'false')
+                ) {
+                $file[0]->order = empty($result[CsvImport_ColumnMap::METADATA_FILE_ORDER]) ?
+                    null :
+                    $result[CsvImport_ColumnMap::METADATA_FILE_ORDER];
+
+                // Not very clean but needed and efficient until Omeka 2.
+                $data = array('order' => $file[0]->order);
+                $where = array('id = ?' => $file[0]->id);
+                $this->_db->update($this->_db->Files, $data, $where);
+            }
+        } catch (Omeka_File_Ingest_InvalidException $e) {
+            $msg = "Error occurred when attempting to ingest the following URL as a file: '" . $url['source'] . "': "
+                . $e->getMessage();
+            $this->_log($msg, Zend_Log::INFO);
+            return false;
+        }
+
+        return $file;
+    }
+
+    // Adds element text records for an attached file based on the row data.
+    private function _addMetadataToAttachedFile($metadata) {
+        $filename = $metadata[CsvImport_ColumnMap::TARGET_TYPE_FILENAME];
         $file = $this->_getFileByOriginalFilename($filename);
         if (!$file) {
             throw new Omeka_Record_Exception(__('File "%s" does not exist in the database. No item associated with it was found. Add items first before importing file metadata.',
              $filename));
         }
 
-        $elementTexts = $result[CsvImport_ColumnMap::TARGET_TYPE_ELEMENT];
+        $elementTexts = $metadata[CsvImport_ColumnMap::TARGET_TYPE_ELEMENT];
         // Keep only non empty fields to avoid removing them (update).
         $elementTexts = array_filter($elementTexts, 'self::_removeEmptyElement');
 
@@ -458,13 +544,13 @@ class CsvImport_Import extends Omeka_Record
         // See note above, in _addItemFromRow().
         // During import of files metadata, the true value of the field can be
         // used.
-        if (isset($row['fileOrder'])) {
-            $file->order = (empty($row['fileOrder'])
-                    || $row['fileOrder'] === 'false'
-                    || 0 == (integer) $row['fileOrder']
+        if (isset($result[CsvImport_ColumnMap::METADATA_FILE_ORDER])) {
+            $file->order = (empty($result[CsvImport_ColumnMap::METADATA_FILE_ORDER])
+                    || $result[CsvImport_ColumnMap::METADATA_FILE_ORDER] === 'false'
+                    || 0 == (integer) $result[CsvImport_ColumnMap::METADATA_FILE_ORDER]
                 ) ?
                 null :
-                (integer) $row['fileOrder'];
+                (integer) $result[CsvImport_ColumnMap::METADATA_FILE_ORDER];
         }
         $file->save();
         return $file;
@@ -492,12 +578,13 @@ class CsvImport_Import extends Omeka_Record
         return $this->_db->getTable('File')->fetchObject($select);
     }
 
-    private function recordImportedItemId($itemId)
+    private function recordImportedItemId($itemId, $sourceItemId)
     {
         $csvImportedItem = new CsvImport_ImportedItem();
         $csvImportedItem->setArray(array(
             'import_id' => $this->id,
             'item_id' => $itemId,
+            'source_item_id' => $sourceItemId,
         ));
         $csvImportedItem->forceSave();
         $this->_importedCount++;

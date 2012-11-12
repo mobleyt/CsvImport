@@ -169,7 +169,7 @@ class CsvImport_IndexController extends Omeka_Controller_Action
         );
         $errors = array();
         foreach ($this->session->columnNames as $columnName) {
-            if (!in_array($columnName, $skipColumns)) {
+            if (!in_array($columnName, $skipColumns) && (substr($columnName, 0, 5) != 'None:')) {
                 $data = explode(':', $columnName);
                 //$data is like array('Element Set Name', 'Element Name');
                 //dig up the element_id
@@ -195,15 +195,15 @@ class CsvImport_IndexController extends Omeka_Controller_Action
             switch ($heading) {
                 case 'importType':
                     // Currently not used.
+                    // Will be used to create, overwrite or update.
                     $columnMaps[] = new CsvImport_ColumnMap_None($heading);
                     break;
                 case 'recordType':
                     $columnMaps[] = new CsvImport_ColumnMap_RecordType($heading);
                     break;
 
-                case 'sourceItemId':
-                    // Currently not used.
-                    $columnMaps[] = new CsvImport_ColumnMap_None($heading);
+                case 'itemId':
+                    $columnMaps[] = new CsvImport_ColumnMap_SourceItemId($heading);
                     break;
 
                 case 'collection':
@@ -233,8 +233,13 @@ class CsvImport_IndexController extends Omeka_Controller_Action
                     $columnMaps[] = new CsvImport_ColumnMap_Filename($heading);
                     break;
                 case 'fileOrder':
-                    // TODO
+                    // TODO To check.
                     $columnMaps[] = new CsvImport_ColumnMap_FileOrder($heading);
+                    break;
+
+                // Allow to have data in the Csv sheet that will not be used.
+                case substr($heading, 0, 5) == 'None:':
+                    $columnMaps[] = new CsvImport_ColumnMap_None($heading);
                     break;
 
                 default:

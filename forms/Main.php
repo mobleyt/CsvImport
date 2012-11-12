@@ -23,6 +23,7 @@ class CsvImport_Form_Main extends Omeka_Form
     {
         parent::init();
         $this->setAttrib('id', 'csvimport');
+        $this->setName('csvimport');
         $this->setMethod('post');
 
         $this->_addFileElement();
@@ -37,7 +38,7 @@ class CsvImport_Form_Main extends Omeka_Form
         $this->addElement('radio', 'record_type_id', array(
             'label' => 'Record type',
             'multiOptions' => array(
-                1 => 'All (via Omeka CSV Report)',
+                1 => 'Any',
                 2 => 'Item',
                 3 => 'File',
             ),
@@ -64,8 +65,16 @@ class CsvImport_Form_Main extends Omeka_Form
         ));
         $this->addElement('checkbox', 'elements_are_html', array(
             'label' => 'All imported elements are html?',
-            'description' => 'Used only with automatic import via Omeka CSV Report.',
+            'description' => 'When elements are imported automatically, this checkbox allows to set their default format, raw text or html.',
         ));
+        // Used to hide some elements when record type is set to all.
+        $this->addDisplayGroup(array(
+            'item_type_id',
+            'collection_id', 
+            'items_are_public',
+            'items_are_featured',
+        ), 'recordtype'); 
+        $this->addDisplayGroup(array('elements_are_html'), 'recordtypeno'); 
 
         switch ($this->_columnDelimiter) {
             case ',':

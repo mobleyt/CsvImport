@@ -69,7 +69,7 @@ Current maintainers:
 
 - Forked plugin
 * Shawn Averkamp (see [saverkamp][6])
-* Daniel Berthereau (see [Daniel_KM][7])
+* Daniel Berthereau (see [Daniel-KM][7])
 
 
 Copyright
@@ -89,4 +89,4 @@ Copyright
 [4]: https://www.gnu.org/licenses/gpl-3.0.html "GNU/GPL"
 [5]: https://github.com/omeka "CHNM"
 [6]: https://github.com/saverkamp "saverkamp"
-[7]: https://github.com/Daniel-KM "Daniel_KM"
+[7]: https://github.com/Daniel-KM "Daniel Berthereau"

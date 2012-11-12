@@ -63,6 +63,7 @@ require_once CSV_IMPORT_DIRECTORY . '/functions.php';
 
 add_plugin_hook('install', 'csv_import_install');
 add_plugin_hook('uninstall', 'csv_import_uninstall');
+add_plugin_hook('upgrade', 'csv_import_upgrade');
 add_plugin_hook('admin_theme_header', 'csv_import_admin_header');
 add_plugin_hook('define_acl', 'csv_import_define_acl');
 

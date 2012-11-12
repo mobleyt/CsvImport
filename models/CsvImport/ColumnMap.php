@@ -30,8 +30,9 @@ abstract class CsvImport_ColumnMap
     const METADATA_PUBLIC = 'Public';
     const METADATA_FEATURED = 'Featured';
     const METADATA_ITEM_TYPE = 'ItemType';
-    // Not managed as other data.
     const METADATA_FILE_ORDER = 'FileOrder';
+
+    const SOURCE_ITEM_ID = 'SourceItemId';
 
     protected $_columnName;
     protected $_targetType;
