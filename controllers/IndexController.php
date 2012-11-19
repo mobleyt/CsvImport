@@ -87,10 +87,9 @@ class CsvImport_IndexController extends Omeka_Controller_Action
 
         set_option('csv_import_html_elements', $this->session->elementsAreHtml);
 
-        if ($form->getValue('omeka_csv_export')) {
+        if ($form->getValue('omeka_csv_export') || ($form->getValue('record_type_id') == 1)) {
             $this->_helper->redirector->goto('check-omeka-csv');
         }
-
         $this->_helper->redirector->goto('map-columns');
     }
 
