@@ -24,7 +24,8 @@ class CsvImport_ColumnMap_ExportedElement extends CsvImport_ColumnMap {
     {
         //@TODO: see if we can handle multiple values
         $text = $row[$this->_columnName];
-        $elementTextsData = explode('^^', $text);
+        $delimiter_multivalues = get_option('csv_import_delimiter_multivalues');
+        $elementTextsData = explode($delimiter_multivalues, $text);
         $data = explode(':', $this->_columnName);
         //$data is like array('Element Set Name', 'Element Name');
         //dig up the element_id

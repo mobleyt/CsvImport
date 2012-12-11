@@ -9,6 +9,9 @@
 // this fork includes new db field for record type id
 function csv_import_install()
 {
+    // This standard delimiter is used for CsvImport Report.
+    set_option('csv_import_delimiter_multivalues', '^^');
+
     $db = get_db();
 
     // create csv imports table
@@ -55,6 +58,7 @@ function csv_import_uninstall()
     delete_option('csv_import_memory_limit');
     delete_option('csv_import_php_path');
     delete_option('csv_import_html_elements');
+    delete_option('csv_import_delimiter_multivalues');
 
     // drop the tables
     $db = get_db();
@@ -91,6 +95,26 @@ function csv_import_upgrade($oldVersion, $newVersion)
                 $db->query($sql);
             }
     }
+}
+
+
+/**
+ * Shows plugin configuration page.
+ */
+function csv_import_config_form()
+{
+    include('config_form.php');
+}
+
+/**
+ * Saves plugin configuration page and creates folders if needed.
+ *
+ * @param array Options set in the config form.
+ */
+function csv_import_config($post)
+{
+    // Save settings.
+    set_option('csv_import_delimiter_multivalues', $post['csv_import_delimiter_multivalues']);
 }
 
 /**
