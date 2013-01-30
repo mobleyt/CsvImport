@@ -376,6 +376,13 @@ class CsvImport_Import extends Omeka_Record
         try {
             $item = insert_item(array_merge(array('tags' => $tags), $itemMetadata), $elementTexts);
 
+            // Call hooks for item.
+            $args = array(
+                'result' => $result,
+                'item' => $item,
+            );
+            fire_plugin_hook('csv_import_modify_item', &$args);
+
         } catch (Omeka_Validator_Exception $e) {
             $this->_log($e, Zend_Log::ERR);
             return false;
@@ -404,9 +411,8 @@ class CsvImport_Import extends Omeka_Record
                         )
                     );
 
-                    // If there is no column "fileOrder", default order
-                    // is not changed. It's sometime different than the natural
-                    // one.
+                    // If there is no column "fileOrder", default order is not
+                    // changed. It's sometime different than the natural one.
                     if (!is_null($fileOrder)) {
                         $file[0]->order = empty($fileOrder) ?
                             // If column "fileOrder" is empty ('' or 0),
@@ -510,6 +516,14 @@ class CsvImport_Import extends Omeka_Record
                 $where = array('id = ?' => $file[0]->id);
                 $this->_db->update($this->_db->Files, $data, $where);
             }
+
+            // Call hooks for file.
+            $args = array(
+                'result' => $result,
+                'file' => $file,
+            );
+            fire_plugin_hook('csv_import_modify_file', &$args);
+
         } catch (Omeka_File_Ingest_InvalidException $e) {
             $msg = "Error occurred when attempting to ingest the following URL as a file: '" . $url['source'] . "': "
                 . $e->getMessage();
