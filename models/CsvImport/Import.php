@@ -355,7 +355,7 @@ class CsvImport_Import extends Omeka_Record
         $elementTexts = array_filter($elementTexts, 'self::_removeEmptyElement');
 
         // If this is coming from CSV Report, bring in the item metadata coming
-        // from the report
+        // from the report.
         if (!is_null($result[CsvImport_ColumnMap::METADATA_COLLECTION])) {
             $itemMetadata['collection_id'] = $result[CsvImport_ColumnMap::METADATA_COLLECTION];
         }

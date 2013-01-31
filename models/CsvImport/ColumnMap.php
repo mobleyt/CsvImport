@@ -25,6 +25,7 @@ abstract class CsvImport_ColumnMap
     const TARGET_TYPE_FILENAME = 'Filename';
 
     const METADATA_NONE = 'None';
+    const METADATA_PLUGIN = 'Plugin';
     const METADATA_RECORD_TYPE = 'RecordType';
     const METADATA_COLLECTION = 'Collection';
     const METADATA_PUBLIC = 'Public';

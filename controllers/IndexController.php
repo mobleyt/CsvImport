@@ -163,7 +163,7 @@ class CsvImport_IndexController extends Omeka_Controller_Action
         $skipColumns = array(
             'importType', 'recordType',
             'itemId',
-            'itemType', 'collection', 'public', 'featured', 'accessDate', 'tags', 'file',
+            'itemType', 'collection', 'public', 'featured', 'accessDate', 'tags', 'plugin', 'file',
             'fileId', 'fileOrder', 'fileSource', 'fileAuthentication',
         );
         $errors = array();
@@ -216,6 +216,9 @@ class CsvImport_IndexController extends Omeka_Controller_Action
                     break;
                 case 'tags':
                     $columnMaps[] = new CsvImport_ColumnMap_Tag($heading);
+                    break;
+                case 'plugin':
+                    $columnMaps[] = new CsvImport_ColumnMap_Plugin($heading);
                     break;
                 case 'public':
                     $columnMaps[] = new CsvImport_ColumnMap_Public($heading);
