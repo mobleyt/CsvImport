@@ -197,15 +197,15 @@ Current maintainers:
 This plugin has been built by [Center for History & New Media]. Next, the
 release 1.3.4 has been forked for [University of Iowa Libraries] and upgraded
 for [École des Ponts ParisTech] and [Pop Up Archive]. The fork of this plugin
-has been upgraded for Omeka 2.0 for [Mines ParisTech] and may be integrated into
-mainstream.
+has been upgraded for Omeka 2.0 for [École des Mines ParisTech] and may be
+integrated into mainstream.
 
 
 Copyright
 ---------
 
 * Copyright Center for History and New Media, 2008-2013
-* Copyright Daniel Berthereau, 2012-2013
+* Copyright Daniel Berthereau, 2012-2014
 * Copyright Shawn Averkamp, 2012
 
 
@@ -219,6 +219,6 @@ Copyright
 [Daniel-KM]: https://github.com/Daniel-KM "Daniel Berthereau"
 [saverkamp]: https://github.com/saverkamp "saverkamp"
 [University of Iowa Libraries]: http://www.lib.uiowa.edu
-[École des Ponts ParisTech]: http://bibliotheque.enpc.fr "École des Ponts ParisTech / ENPC"
+[École des Ponts ParisTech]: http://bibliotheque.enpc.fr
 [Pop Up Archive]: http://popuparchive.org
-[Mines ParisTech]: http://bib.mines-paristech.fr "Mines ParisTech / ENSMP"
+[École des Mines ParisTech]: http://bib.mines-paristech.fr

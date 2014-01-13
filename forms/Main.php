@@ -72,7 +72,7 @@ class CsvImport_Form_Main extends Omeka_Form
 
         $this->addElement('checkbox', 'elements_are_html', array(
             'label' => __('All imported elements are html?'),
-            'description' => 'This checkbox allows to set default format of all imported elements as raw text or html.',
+            'description' => __('This checkbox allows to set default format of all imported elements as raw text or html.'),
             'value' => get_option('csv_import_html_elements'),
         ));
 

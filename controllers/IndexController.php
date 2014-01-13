@@ -296,7 +296,7 @@ class CsvImport_IndexController extends Omeka_Controller_AbstractActionControlle
             $this->_helper->redirector->goto('index');
         }
 
-        $this->_helper->redirector->goto('omeka-csv');
+        $this->_helper->redirector->goto('omeka-csv', 'index', 'csv-import');
     }
 
     /**

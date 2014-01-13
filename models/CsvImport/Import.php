@@ -778,7 +778,7 @@ class CsvImport_Import extends Omeka_Record_AbstractRecord
 
         $elementTexts = $result[CsvImport_ColumnMap::TYPE_ELEMENT];
         // Keep only non empty fields to avoid removing them (allow update).
-        $elementTexts = array_filter($elementTexts, 'self::_removeEmptyElement');
+        $elementTexts = array_values(array_filter($elementTexts, 'self::_removeEmptyElement'));
         // Trim metadata to avoid spaces.
         $elementTexts = $this->_trimElementTexts($elementTexts);
         try {
@@ -809,14 +809,26 @@ class CsvImport_Import extends Omeka_Record_AbstractRecord
      */
     protected function _attachFilesToItem($item, $fileUrls, $itemDelete = true)
     {
-        foreach ($fileUrls as $url) {
+        foreach ($fileUrls as $fileUrl) {
+            // Set the transfer strategy according to file name.
+            $parsedFileUrl = parse_url($fileUrl);
+            if (!isset($parsedFileUrl['scheme']) || $parsedFileUrl['scheme'] == 'file') {
+                $transferStrategy = 'Filesystem';
+                $fileUrl = $parsedFileUrl['path'];
+            }
+            else {
+                $transferStrategy = 'Url';
+            }
+
+            // Import the file and attach it to the item.
             try {
                 $files = insert_files_for_item($item,
-                    'Url', $url,
+                    $transferStrategy,
+                    $fileUrl,
                     array('ignore_invalid_files' => false));
             } catch (Omeka_File_Ingest_InvalidException $e) {
-                $msg = __("Error occurred when attempting to ingest '%s' as a file:", $url)
-                    . ' ' . $e->getMessage();
+                $msg = __("Error occurred when attempting to ingest '%s' as a file: %s",
+                    $fileUrl, $e->getMessage());
                 $this->_log($msg, Zend_Log::ERR);
                 if ($itemDelete) {
                     $item->delete();
@@ -871,14 +883,25 @@ class CsvImport_Import extends Omeka_Record_AbstractRecord
         }
         $item = get_record_by_id('Item', $csvImportedItem[0]->item_id);
 
-        // Import the file and attach it to item.
+        // Set the transfer strategy according to file name.
+        $parsedFileUrl = parse_url($fileUrl);
+        if (!isset($parsedFileUrl['scheme']) || $parsedFileUrl['scheme'] == 'file') {
+            $transferStrategy = 'Filesystem';
+            $fileUrl = $parsedFileUrl['path'];
+        }
+        else {
+            $transferStrategy = 'Url';
+        }
+
+        // Import the file and attach it to the item.
         try {
             $files = insert_files_for_item($item,
-                'Url', $fileUrl,
+                $transferStrategy,
+                $fileUrl,
                 array('ignore_invalid_files' => false));
         } catch (Omeka_File_Ingest_InvalidException $e) {
-            $msg = __("Error occurred when attempting to ingest '%s' as a file:", $fileUrl)
-                . ' ' . $e->getMessage();
+            $msg = __("Error occurred when attempting to ingest '%s' as a file: %s",
+                $fileUrl, $e->getMessage());
             $this->_log($msg, Zend_Log::ERR);
             return false;
         }
@@ -990,7 +1013,7 @@ class CsvImport_Import extends Omeka_Record_AbstractRecord
         $elementTexts = $this->_trimElementTexts($elementTexts);
         // Keep only non empty fields to avoid removing them to allow update.
         if ($mode == 'Add' || $mode == 'Replace') {
-            $elementTexts = array_filter($elementTexts, 'self::_removeEmptyElement');
+            $elementTexts = array_values(array_filter($elementTexts, 'self::_removeEmptyElement'));
         }
         // Overwrite existing element text values if wanted.
         if ($mode == 'Replace' || $mode == 'Replace all') {
