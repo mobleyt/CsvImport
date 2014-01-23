@@ -280,7 +280,7 @@ class CsvImportPlugin extends Omeka_Plugin_AbstractPlugin
     public function filterAdminNavigationMain($nav)
     {
         $nav[] = array(
-            'label' => __('Csv Import'),
+            'label' => __('CSV Import'),
             'uri' => url('csv-import'),
             'resource' => 'CsvImport_Index',
             'privilege' => 'index',
