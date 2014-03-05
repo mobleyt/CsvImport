@@ -948,15 +948,14 @@ class CsvImport_Import extends Omeka_Record_AbstractRecord
             return false;
         }
 
-        $files = get_records('File', array('original_filename' => $fileUrl), 1);
-        if (empty($files)) {
+        $file = get_db()->getTable('File')->findBySql('original_filename = ?', array($fileUrl), true);
+        if (empty($file)) {
             $msg = __('File "%s" does not exist in the database.', $fileUrl)
                 . ' ' . __('No item associated with it was found.')
                 . ' ' . __('Add items first before importing file metadata.');
             $this->_log($msg, Zend_Log::ERR);
             return false;
         }
-        $file = $files[0];
 
         // Update file with new metadata.
         $this->_updateRecord($file, $result);
@@ -1181,6 +1180,7 @@ class CsvImport_Import extends Omeka_Record_AbstractRecord
     {
         $prefix = "[CsvImport][#{$this->id}]";
         $msg = str_replace('%memory%', memory_get_usage(), $msg);
+        $msg = str_replace('%time%', date('Y-m-d G:i:s'), $msg);
         _log("$prefix $msg", $priority);
     }
 }
