@@ -70,6 +70,24 @@ Note that these jobs run sequentially based on the results of prior jobs,
 meaning that the import cannot be parallelized.  The first job will import
 5000 rows and then spawn the next job, and so on until the import is completed.
 
+_Important_
+
+On some servers, in particular with shared hosts, an option should be changed in
+the application/config/config.ini file:
+
+```
+jobs.dispatcher.longRunning = "Omeka_Job_Dispatcher_Adapter_BackgroundProcess"
+```
+
+by
+
+```
+jobs.dispatcher.longRunning = "Omeka_Job_Dispatcher_Adapter_Synchronous"
+```
+
+Note that this change may limit the number of lines imported by job. If so, you
+can increase the time limit for process in the server or php configuration.
+
 
 Examples
 --------
@@ -129,6 +147,7 @@ be used. To attach a file to an item, you need to use the column name `file`.
 Columns can be ordered like in examples or not.
 
 _Warning_
+
 Depending of your environment and database, if you imports items with encoded
 urls, they should be decoded when you import files. For example, you can import
 an item with the file "Edmond_Dant%C3%A8s.jpg", but you may import your file
