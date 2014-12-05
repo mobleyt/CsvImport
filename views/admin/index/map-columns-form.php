@@ -12,7 +12,7 @@
         <th><?php echo __('Map To Element'); ?></th>
         <th><?php echo __('Use HTML?'); ?></th>
         <?php if ($format != 'File') { ?>
-        <th><?php echo __('Tags?'); ?></th>
+        <th><?php echo __('Collection?'); ?></th>
         <th><?php echo __('File?'); ?></th>
         <?php } else { ?>
         <th><?php echo __('Filename?'); ?></th>

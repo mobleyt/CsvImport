@@ -761,10 +761,9 @@ class CsvImport_Import extends Omeka_Record_AbstractRecord
         $tags = $result[CsvImport_ColumnMap::TYPE_TAG];
         $itemMetadata = array(
             Builder_Item::ITEM_TYPE_ID => $this->item_type_id,
-            Builder_Item::COLLECTION_ID => $this->collection_id,
+            Builder_Item::COLLECTION_ID => $tags,
             Builder_Item::IS_PUBLIC => $this->is_public,
             Builder_Item::IS_FEATURED => $this->is_featured,
-            Builder_Item::TAGS => $tags,
         );
 
         // If this is coming from CSV Report or from mixed records, bring in the
