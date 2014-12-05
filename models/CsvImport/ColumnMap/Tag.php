@@ -48,6 +48,13 @@ class CsvImport_ColumnMap_Tag extends CsvImport_ColumnMap
             if ($collection) {
                 $tags = $collection->id;
             }
+            elseif(!$collection){
+                $metadata = array('public' => false, 'featured' => false);
+                $elementTexts = array( MODS => array( Title Info:Title => array( array(‘text’ => $tags, ‘html’ => false))));                insert_collection($metadata,$elementTexts);
+                $collection = $this->_getCollectionByTitle($collectionTitle);
+                $tags = $collection->id;
+            }
+            }
         }
         return $tags;
     }
